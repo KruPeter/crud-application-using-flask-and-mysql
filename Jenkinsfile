@@ -31,10 +31,7 @@ node("linux"){
   stage("Push to DockerHub") {
     withDockerRegistry(credentialsId: 'dockerhub.peter.krumer', url: '') 
     {
-      app.push(
-           sh(script: 'docker push peterkr/project_app', returnStdout: true)
-           sh(script: 'docker push peterkr/project_app_mysql', returnStdout: true)
-      )
+      app.push()
     }
   }
   stage('Slack it'){
