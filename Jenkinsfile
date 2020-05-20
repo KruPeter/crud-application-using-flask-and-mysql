@@ -4,7 +4,7 @@ node("linux"){
   }
   
   stage("Create Docker Image") {
-    app = docker.build("peterkr/Project_app")
+    app = docker.build("peterkr/project_app")
   }
 
   stage("verify Docker Image") 
