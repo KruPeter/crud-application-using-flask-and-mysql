@@ -1,21 +1,40 @@
 node("linux"){
+  def app
+  
   stage("Get Repo from brach") {
+    git branch: 'master',
+    url: 'https://github.com/KruPeter/crud-application-using-flask-and-mysql.git' 
     checkout scm
   }
   
   stage("Create Docker Image") {
-    app = docker.build("peterkr/project_app")
+    app = sh(script: 'docker build -q -f Dockerfile -t peterkr/project_app .', returnStdout: true)
+    mysql = sh(script: 'docker build -q -f Dockerfile-mysql -t peterkr/project_app_mysql .', returnStdout: true)
+  }
+  
+  stage('docker-compose') {
+    sh '''
+    docker-compose up -d
+    '''
   }
 
-  stage("verify Docker Image") 
-  {
-    sh "docker images"
-  }
+  stage('verify Docker Image') {
+       response = sh(script: "sleep 10; curl 127.0.0.1:8181", returnStdout: true)
+   }
+    
+  stage('docker-compose') {
+         sh '''
+         docker-compose down
+         '''
+         }
 
   stage("Push to DockerHub") {
     withDockerRegistry(credentialsId: 'dockerhub.peter.krumer', url: '') 
     {
-      app.push()
+      app.push(
+           sh(script: 'docker push peterkr/project_app', returnStdout: true)
+           sh(script: 'docker push peterkr/project_app_mysql', returnStdout: true)
+      )
     }
   }
   stage('Slack it'){
