@@ -12,22 +12,6 @@ node("linux"){
     mysql = sh(script: 'docker build -q -f Dockerfile-mysql -t peterkr/project_app_mysql .', returnStdout: true)
   }
   
-   stage('docker-compose') {
-         sh '''
-         docker-compose up -d
-         '''
-         }
-  
-   stage('Test container') {
-       response = sh(script: "sleep 10; curl 127.0.0.1:8181", returnStdout: true)
-  }  
-  
-    stage('docker-compose') {
-         sh '''
-         docker-compose down
-         '''
-         }
-  
   stage("Push to DockerHub") {
     withDockerRegistry(registry:[
         url: '',
